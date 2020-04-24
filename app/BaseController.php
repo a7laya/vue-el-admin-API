@@ -50,9 +50,66 @@ abstract class BaseController
         $this->initialize();
     }
 
+
+    // 自动实例化模型 - laya
+    protected $M = null;
+
+    // 是否自动实例化模型 - laya
+    protected $autoModel = true;
+
+    // 自定义模型路径 - laya
+    protected $modelPath = null;
+    
+    // 是否自动验证参数 - laya
+    protected $autoValidate = true;
+
+    // 记录当前控制器相关信息 - laya
+    protected $cInfo = [];
+
+    // 自定义验证场景
+    protected $autoValidateScenes = [];
+
+    // 不需要自动验证的方法
+    protected $excludeValidateCheck = [];
+
     // 初始化
     protected function initialize()
-    {}
+    {   
+        
+        // 获取当前控制器信息 - laya 
+        $this->cInfo = [
+            'name' => class_basename($this), // 控制器名称
+            'path' => str_replace('.', '\\', $this->request->controller()), // 控制iqi路径
+            'action' => $this->request->action() // 控制器方法，对应的参数验证的场景scene
+        ];
+        // halt($this->cInfo);
+        // 自动验证参数 - laya
+        $this->autoValidateCheck();
+
+        // 自动实例化当前模型 - laya
+        $this->getCurrentModel();
+
+    }
+    // 自动验证参数 - laya
+    protected function autoValidateCheck()
+    {
+        // 参数验证
+        if( $this->autoValidate && !in_array($this->cInfo['action'], $this->excludeValidateCheck) ){
+            $V = app('app\validate\\'.$this->cInfo['path']);
+            $scene = array_key_exists($this->cInfo['action'],$this->autoValidateScenes) ? $this->autoValidateScenes[$this->cInfo['action']] : $this->cInfo['action'];
+            if(!$V->scene($scene)->check($this->request->param())) {
+                Apiexception($V->getError());
+            }
+        }
+    }
+    // 实例化当前模型 - laya
+    protected function getCurrentModel()
+    {   
+        if($this->autoModel){
+            $modelName = $this->modelPath ? str_replace('/','\\',$this->modelPath) : $this->cInfo['name'];
+            $this->M = app('\app\model\\' . $modelName);
+        }
+    }
 
     /**
      * 验证数据
