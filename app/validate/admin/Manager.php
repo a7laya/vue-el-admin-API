@@ -46,6 +46,12 @@ class Manager extends Validate
      * @var array
      */	
     protected function isExist($value, $rule='', $data='', $field='', $title='记录'){
+        // halt($value, $rule, $data, $field, $title);
+        // $value： 传入的值
+        // $rule： ‘isExist:’ 后面的值 ‘Manager’
+        // $$data: 传入的全部数据 数组 包含验证的字段
+        // $field: 验证的字段‘id’
+        // $title: 名称，有别名的话为别名‘管理员id’
         if(!$value){ //
             return true;
         }
