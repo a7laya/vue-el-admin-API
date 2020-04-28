@@ -66,10 +66,10 @@ abstract class BaseController
     // 记录当前控制器相关信息 - laya
     protected $cInfo = [];
 
-    // 自定义验证场景
+    // 自定义验证场景 - laya [key=>value] key对应调用验证的action  value对应valudate里面的scene
     protected $autoValidateScenes = [];
 
-    // 不需要自动验证的方法
+    // 需要自动验证的方法 - laya
     protected $excludeValidateCheck = [];
 
     // 初始化
@@ -79,7 +79,7 @@ abstract class BaseController
         // 获取当前控制器信息 - laya 
         $this->cInfo = [
             'name' => class_basename($this), // 控制器名称
-            'path' => str_replace('.', '\\', $this->request->controller()), // 控制iqi路径
+            'path' => str_replace('.', '\\', $this->request->controller()), // 控制器路径
             'action' => $this->request->action() // 控制器方法，对应的参数验证的场景scene
         ];
         // halt($this->cInfo);
@@ -94,7 +94,7 @@ abstract class BaseController
     protected function autoValidateCheck()
     {
         // 参数验证
-        if( $this->autoValidate && !in_array($this->cInfo['action'], $this->excludeValidateCheck) ){
+        if( $this->autoValidate && in_array($this->cInfo['action'], $this->excludeValidateCheck) ){
             $V = app('app\validate\\'.$this->cInfo['path']);
             $scene = array_key_exists($this->cInfo['action'],$this->autoValidateScenes) ? $this->autoValidateScenes[$this->cInfo['action']] : $this->cInfo['action'];
             if(!$V->scene($scene)->check($this->request->param())) {

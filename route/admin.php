@@ -11,6 +11,9 @@ Route::group('admin', function(){
     // 管理员列表
     Route::get('manager/:page', 'admin.Manager/index');
     
-    // 创建管理员
+    // 更新管理员
+    Route::post('manager/:id', 'admin.Manager/update');
+    
+    // 创建管理员 该路由规则要写在最下方
     Route::post('manager', 'admin.Manager/save');
 });

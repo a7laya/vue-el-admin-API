@@ -24,8 +24,8 @@ class Manager extends BaseController
     // ];
 
     
-    // 不需要自动验证的方法
-    protected $excludeValidateCheck = ['index'];
+    // 需要自动验证的方法
+    protected $excludeValidateCheck = ['save','update'];
 
 
     /**
@@ -51,6 +51,7 @@ class Manager extends BaseController
         // halt($request)
         
         // $param = $request->param();
+        // 过滤参数
         $param = $request->only(['username','password','avatar','role_id','status']);
 
         $res = $this->M->save($param);
@@ -59,7 +60,7 @@ class Manager extends BaseController
 
 
     /**
-     * 保存更新的资源
+     * 更新管理员
      *
      * @param  \think\Request  $request
      * @param  int  $id
@@ -67,7 +68,14 @@ class Manager extends BaseController
      */
     public function update(Request $request, $id)
     {
-        //
+        // 过滤参数
+        $param = $request->only(['id','username','password','avatar','role_id','status']);
+        // 找到要修改的记录集 写入验证规则了 直接$request->Model
+        // $Model = $this->M->find($param['id']);
+        
+        // 进行修改
+        $res = $request->Model->save($param);
+        return showSuccess($res);
     }
 
     /**
