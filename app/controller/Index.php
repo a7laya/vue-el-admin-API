@@ -7,7 +7,6 @@ class Index extends BaseController
 {
     public function index()
     {   
-        apiException('我是异常1');
         $list = [1,2];
         return showSuccess($list);
     }
