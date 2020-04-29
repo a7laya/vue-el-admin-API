@@ -25,7 +25,7 @@ class Manager extends BaseController
 
     
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['save','update'];
+    protected $excludeValidateCheck = ['save','update','delete','index'];
 
 
     /**
@@ -34,9 +34,54 @@ class Manager extends BaseController
      * @return \think\Response
      */
     public function index()
-    {
-        //
-        return showSuccess('index');
+    {   
+        // 获取参数  getValByKey公共方法写在common.php里面
+        $param = $this->request->param();
+        $page = $param['page']; // 当前页面
+        $limit = getValByKey('limit', $param, 10); // 每页限制条数,默认10条
+        $keyword = getValByKey('keyword', $param, ''); // 关键字, 默认为''
+
+        // 组织查询条件
+        $where = [
+            ['username', 'like', '%'.$keyword.'%']
+        ];
+
+        // 计算总数,主要用于分页
+        $totalCount = $this->M->where($where)->count();
+
+        // 获取列表数据
+        $list = $this->M->page($page, $limit)
+                        ->where($where)
+                        ->with('role') // 关联到Manager模型中的 public function role()
+                        ->order('id', 'desc')
+                        ->select()
+                        ->hidden(['password']);
+
+        return showSuccess([
+            'list' => $list,
+            'totalCount' => $totalCount,
+        ]);
+
+        // $param = request()->param();
+        // $limit = intval(getValByKey('limit',$param,10));
+        // $keyword = getValByKey('keyword',$param,'');
+        // $where = [
+        //     [ 'username','like','%'.$keyword.'%' ]
+        // ];
+
+        // $totalCount = $this->M->where($where)->count();
+        // $list = $this->M->page($param['page'],$limit)
+        //         ->where($where)
+        //         ->with('role')
+        //         ->order([ 'id'=>'desc' ])
+        //         ->select()
+        //         ->hidden(['password']);
+        // $role = \app\model\Role::field(['id','name'])->select();
+        // return showSuccess([
+        //     'list'=>$list,
+        //     'totalCount'=>$totalCount,
+        //     'role'=>$role
+        // ]);
     }
     
 
@@ -85,7 +130,25 @@ class Manager extends BaseController
      * @return \think\Response
      */
     public function delete($id)
-    {
-        //
+    {   
+        /**
+         * Manager验证器里面设置了验证delete的传参id
+         * 同时将该id所在的记录存入request->Model
+         */ 
+        $manager = $this->request->Model;
+
+        /**
+         * 不能删除自己
+         * todo。。。
+         */
+
+        /**
+         * 不能删除超级管理员
+         */
+        if($manager->super === 1){
+            ApiException('不能删除超级管理员');
+        }
+        
+        return showSuccess($manager->delete());
     }
 }

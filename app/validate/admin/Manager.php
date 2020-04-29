@@ -3,9 +3,9 @@ declare (strict_types = 1);
 
 namespace app\validate\admin;
 
-use think\Validate;
+use app\validate\BaseValidate;
 
-class Manager extends Validate
+class Manager extends BaseValidate
 {
     /**
      * 定义验证规则
@@ -14,8 +14,10 @@ class Manager extends Validate
      * @var array
      */	
 	protected $rule = [
+        'page' => 'require|integer|>:0', 
+        'limit' => 'integer|>:0', 
         'id|管理员id' => 'require|integer|>:0|isExist:Manager', // isExist是自定义规则
-        'username'   => 'require|min:5|max:20',
+        'username|管理员用户名'   => 'require|min:5|max:20',
         'password'   => 'require|min:5|max:20',
         'avatar'     => 'url',
         'role_id'    => 'require|integer|>:0',
@@ -33,39 +35,25 @@ class Manager extends Validate
     /**
      * 定义验证场景
      * 格式：'场景名'	=>	['需验证的字段']
-     *
+     * 验证场景未指定则按全部规则进行验证
      * @var array
      */	
     protected $scene = [
-        'save' => ['username', 'password', 'avatar', 'role_id', 'status'],
-        'update' => ['id', 'username', 'password', 'avatar', 'role_id', 'status']
+        // 'save' => ['username', 'password', 'avatar', 'role_id', 'status'],
+        // 'update' => ['id', 'username', 'password', 'avatar', 'role_id', 'status'],
+        'delete' => ['id'],
+        'index' => ['page']
     ];
 
-    /**
-     * 自定义验证规则
-     * @var array
-     */	
-    protected function isExist($value, $rule='', $data='', $field='', $title='记录'){
-        // halt($value, $rule, $data, $field, $title);
-        // $value： 传入的值
-        // $rule： ‘isExist:’ 后面的值 ‘Manager’
-        // $$data: 传入的全部数据 数组 包含验证的字段
-        // $field: 验证的字段‘id’
-        // $title: 名称，有别名的话为别名‘管理员id’
-        if(!$value){ //
-            return true;
-        }
-        $model = '\app\model\\'.$rule;
-        
-        // 找到要修改的记录集
-        $m = $model::find($value);
-        
-        if(!$m){
-            return '该'.$title.'不存在';
-        }
-        // 写入request 可以在控制器中$request->Model进行调用
-        request()->Model = $m;
-
-        return true;
+    // 创建管理员的验证场景
+    public function sceneSave(){
+        return $this->only(['username', 'password', 'avatar', 'role_id', 'status'])->append('username','unique:Manager');
     }
+
+    // 更新管理员的验证场景
+    public function sceneUpdate(){
+        $id = request()->param('id');
+        return $this->only(['id', 'username', 'password', 'avatar', 'role_id', 'status'])->append('username','unique:Manager,username,'.$id);
+    }
+    
 }

@@ -17,3 +17,8 @@ function showSuccess($data = '',$msg = 'ok',$code = 200){
 function showError($msg = 'error',$code = 400){
     return json([ 'msg' => $msg ],$code);
 }
+
+// 获取数组指定key的value
+function getValByKey($key, $arr, $default = false){
+    return array_key_exists($key, $arr) ? $arr[$key] : $default;
+}
