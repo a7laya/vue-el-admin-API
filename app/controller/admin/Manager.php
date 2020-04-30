@@ -144,7 +144,7 @@ class Manager extends BaseController
 
         /**
          * 不能删除超级管理员
-         */
+         */ 
         if($manager->super === 1){
             ApiException('不能删除超级管理员');
         }
