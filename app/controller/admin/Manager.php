@@ -25,11 +25,11 @@ class Manager extends BaseController
 
     
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['save','update','delete','index'];
+    protected $excludeValidateCheck = ['save','update','delete','index', 'login'];
 
 
     /**
-     * 显示资源列表
+     * 显示管理员列表
      *
      * @return \think\Response
      */
@@ -56,32 +56,13 @@ class Manager extends BaseController
                         ->order('id', 'desc')
                         ->select()
                         ->hidden(['password']);
-
+        $role = \app\model\Role::field(['id', 'name'])->select();
         return showSuccess([
             'list' => $list,
             'totalCount' => $totalCount,
+            'role' => $role
         ]);
 
-        // $param = request()->param();
-        // $limit = intval(getValByKey('limit',$param,10));
-        // $keyword = getValByKey('keyword',$param,'');
-        // $where = [
-        //     [ 'username','like','%'.$keyword.'%' ]
-        // ];
-
-        // $totalCount = $this->M->where($where)->count();
-        // $list = $this->M->page($param['page'],$limit)
-        //         ->where($where)
-        //         ->with('role')
-        //         ->order([ 'id'=>'desc' ])
-        //         ->select()
-        //         ->hidden(['password']);
-        // $role = \app\model\Role::field(['id','name'])->select();
-        // return showSuccess([
-        //     'list'=>$list,
-        //     'totalCount'=>$totalCount,
-        //     'role'=>$role
-        // ]);
     }
     
 
@@ -150,5 +131,17 @@ class Manager extends BaseController
         }
         
         return showSuccess($manager->delete());
+    }
+
+     /**
+     * 登录
+     *
+     * @param  string  $username
+     * @param  string  $password
+     * @return \think\Response
+     */
+    public function login()
+    {
+        return showSuccess('登录');
     }
 }

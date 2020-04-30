@@ -18,8 +18,8 @@ class Manager extends Model
     // 用户属于哪个角色 反向一对多
     public function role()
     {
-        return $this->belongsto('Role');
+        return $this->belongsTo('Role');
         // 数据库设计的时候已经把关联的外键字段设计为role_id,所以可以省略掉第二个参数
-        // return $this->belongsto('Role', 'role_id');
+        // return $this->belongsTo('Role', 'role_id');
     }
 }

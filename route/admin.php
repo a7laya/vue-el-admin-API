@@ -4,8 +4,13 @@
 // +----------------------------------------------------------------------
 use think\facade\Route;
 
-// 创建管理员
-// Route::post('admin/manager', 'admin.Manager/save');
+// 游客-不需要身份验证
+Route::group('admin', function(){
+    // 登录 
+    Route::post('login', 'admin.Manager/login');
+})->allowCrossDomain();
+
+// 管理员-需要身份验证的
 Route::group('admin', function(){
 
     // 删除管理员 

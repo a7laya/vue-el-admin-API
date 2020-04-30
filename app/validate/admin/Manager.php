@@ -56,4 +56,24 @@ class Manager extends BaseValidate
         return $this->only(['id', 'username', 'password', 'avatar', 'role_id', 'status'])->append('username','unique:Manager,username,'.$id);
     }
     
+    // 登录场景
+    public function sceneLogin(){
+        return $this->only(['username', 'password'])->append('password','checklogin');
+    }
+
+    // 验证登录
+    public function checklogin($value, $rule='', $data='', $field='', $title=''){
+        // 验证账号是否存在
+        $M = \app\model\Manager::where('username', $data['username'])->find();
+        if(!$M) return '用户名不存在';
+
+        // 验证密码
+        if (!password_verify($data['password'],$M->password)) {
+            return '密码错误';
+        }
+
+        // 如果通过，将当前用户实例挂载到request
+        request()->UserModel = $M;
+        return true;
+    }
 }
