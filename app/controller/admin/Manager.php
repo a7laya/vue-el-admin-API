@@ -6,9 +6,13 @@ namespace app\controller\admin;
 use think\Request;
 // 继承基础控制器
 use app\BaseController;
-
+ 
 class Manager extends BaseController
 {   
+ 
+
+    // 当前方法对应的模型 $this->M,在BaseController中挂载 
+
     // 关闭自动实例化模型
     // protected $autoModel = false;
 
@@ -22,10 +26,9 @@ class Manager extends BaseController
     // protected $autoValidateScenes = [
     //     'save' => 'save1'
     // ];
-
     
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['save','update','delete','index', 'login'];
+    protected $excludeValidateCheck = ['save','update','delete','index', 'login', 'updateStatus'];
 
 
     /**
@@ -96,7 +99,7 @@ class Manager extends BaseController
     {
         // 过滤参数
         $param = $request->only(['id','username','password','avatar','role_id','status']);
-        // 找到要修改的记录集 写入验证规则了 直接$request->Model
+        // 找到要修改的记录集 在validate的验证$id的时候 挂载在request()->Model
         // $Model = $this->M->find($param['id']);
         
         // 进行修改
@@ -105,7 +108,21 @@ class Manager extends BaseController
     }
 
     /**
-     * 删除指定资源
+     * 修改管理员状态(启用|禁用)
+     */
+    public function updateStatus() {  
+        // 找到要修改的记录集 在validate的验证$id的时候 挂载在request()->Model
+        $manager = $this->request->Model;
+        // 不能禁用自己
+        if($this->request->UserModel->id === $manager->id){
+            return showSuccess('不能禁用自己');
+        }
+        $manager->status = $this->request->param('status');
+        return showSuccess($manager->save());
+    }
+
+    /**
+     * 删除管理员
      *
      * @param  int  $id
      * @return \think\Response
@@ -118,14 +135,12 @@ class Manager extends BaseController
          */ 
         $manager = $this->request->Model;
 
-        /**
-         * 不能删除自己
-         * todo。。。
-         */
+        // 不能删除自己
+        if($this->request->UserModel->id == $manager->id){
+            ApiException('不能删除自己');
+        }
 
-        /**
-         * 不能删除超级管理员
-         */ 
+        // 不能删除超级管理员
         if($manager->super === 1){
             ApiException('不能删除超级管理员');
         }
@@ -138,10 +153,27 @@ class Manager extends BaseController
      *
      * @param  string  $username
      * @param  string  $password
-     * @return \think\Response
+     * @return array $user
      */
-    public function login()
+    public function login(Request $request)
     {
-        return showSuccess('登录');
+        $user = cms_login([
+            'data'=>$request->UserModel
+        ]);
+        return showSuccess($user);
     }
+
+    /**
+     * 登出
+     */
+    public function logout()
+    {
+        $res = cms_logout([
+            'token' => $this->request->header('token')
+        ]);
+
+        return showSuccess($res);
+    }
+
+
 }

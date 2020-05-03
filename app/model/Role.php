@@ -14,4 +14,10 @@ class Role extends Model{
     public function managers(){
         return $this->hasMany('Manager');
     }
+
+    // 角色-权限 多对多关系  中间表-role_rule 
+    public function rules(){
+        // belongsToMany(模型,中间表)
+        return $this->belongsToMany('Rule','role_rule');
+    }
 }

@@ -29,7 +29,7 @@ class BaseValidate extends Validate
         if(!$m){
             return '该'.$title.'不存在';
         }
-        // 写入request 可以在控制器中$request->Model进行调用
+        // 将找到的$m挂载到request 可以在控制器中$request->Model进行调用
         request()->Model = $m;
 
         return true;

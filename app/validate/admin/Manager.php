@@ -5,7 +5,7 @@ namespace app\validate\admin;
 
 use app\validate\BaseValidate;
 
-class Manager extends BaseValidate
+class Manager extends BaseValidate 
 {
     /**
      * 定义验证规则
@@ -42,7 +42,8 @@ class Manager extends BaseValidate
         // 'save' => ['username', 'password', 'avatar', 'role_id', 'status'],
         // 'update' => ['id', 'username', 'password', 'avatar', 'role_id', 'status'],
         'delete' => ['id'],
-        'index' => ['page']
+        'index' => ['page'],
+        'updateStatus'=>['id','status']
     ];
 
     // 创建管理员的验证场景
@@ -60,7 +61,7 @@ class Manager extends BaseValidate
     public function sceneLogin(){
         return $this->only(['username', 'password'])->append('password','checklogin');
     }
-
+ 
     // 验证登录
     public function checklogin($value, $rule='', $data='', $field='', $title=''){
         // 验证账号是否存在
