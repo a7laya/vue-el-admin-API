@@ -1,4 +1,5 @@
 <?php
+// 除了登录之外,基本上所有接口都要走这个中间件
 declare (strict_types = 1);
 
 namespace app\middleware;

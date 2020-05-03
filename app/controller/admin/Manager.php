@@ -35,6 +35,9 @@ class Manager extends BaseController
      * 显示管理员列表
      *
      * @return \think\Response
+     * 
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 
+     * 
      */
     public function index()
     {   
@@ -74,6 +77,7 @@ class Manager extends BaseController
      *
      * @param  \think\Request  $request
      * @return \think\Response
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 3.$this->M->save($param)
      */
     public function save(Request $request)
     {

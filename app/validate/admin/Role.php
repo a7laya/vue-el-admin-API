@@ -14,7 +14,9 @@ class Role extends BaseValidate
      * @var array
      */	
     protected $rule = [
-        'page' => 'require|integer|>:0'
+        'page' => 'require|integer|>:0',
+        'status' => 'require|integer|in:0,1',
+        'name' => 'require',
     ];
     
     /**
@@ -32,6 +34,7 @@ class Role extends BaseValidate
      * @var array
      */	
     protected $scene = [
-        'index' => ['page']
+        'index' => ['page'],
+        'save' => ['name', 'status']
     ];
 }

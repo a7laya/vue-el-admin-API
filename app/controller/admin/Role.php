@@ -26,12 +26,13 @@ class Role extends Basecontroller
     // ];
 
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['index'];
+    protected $excludeValidateCheck = ['index', 'save'];
 
     /**
      * 显示资源列表
      *
      * @return \think\Response
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 
      */
     public function index()
     {
@@ -54,25 +55,23 @@ class Role extends Basecontroller
         ]);
     }
 
-    /**
-     * 显示创建资源表单页.
-     *
-     * @return \think\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * 保存新建的资源
-     *
+     * 创建角色
      * @param  \think\Request  $request
      * @return \think\Response
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 3.$this->M->save()
      */
     public function save(Request $request)
     {
-        //
+        
+        // 过滤参数 name-名称  status-状态  desc-描述
+        // $param = $request->only(['name','status','desc']);
+        // 也可以全部接受
+        $param = $request->param();
+        
+        $res = $this->M->save($param);
+        return showSuccess($res);
     }
 
     /**
