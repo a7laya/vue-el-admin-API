@@ -26,7 +26,7 @@ class Role extends Basecontroller
     // ];
 
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['index', 'save'];
+    protected $excludeValidateCheck = ['index', 'save','update', 'updateStatus', 'delete'];
 
     /**
      * 显示资源列表
@@ -97,15 +97,31 @@ class Role extends Basecontroller
     }
 
     /**
-     * 保存更新的资源
+     * 更新角色
      *
      * @param  \think\Request  $request
      * @param  int  $id
      * @return \think\Response
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 3.$this->M->save($param)
+     * 
      */
     public function update(Request $request, $id)
     {
-        //
+        // 过滤参数
+        $param = $request->only(['id', 'name', 'status', 'desc']);
+        // 找到要修改的记录集 在validate的验证$id的时候 通过BaseValidate中的isExist方法挂载在request()->Model
+        $res = $request->Model->save($param);
+        return showSuccess($res);
+    }
+
+    /**
+     * 修改角色状态(启用|禁用)
+     */
+    public function updateStatus() {  
+        // 找到要修改的记录集 在validate的验证$id的时候 挂载在request()->Model
+        $role = $this->request->Model;
+        $role->status = $this->request->param('status');
+        return showSuccess($role->save());
     }
 
     /**
@@ -116,6 +132,15 @@ class Role extends Basecontroller
      */
     public function delete($id)
     {
-        //
+        /**
+         * 验证器里面设置了该场景的id验证
+         * 同时将该id所在的记录存入request->Model
+         */ 
+        $role = $this->request->Model;
+        $count = $role->managers->count();
+        if($count > 0){
+            ApiException('该角色已绑定管理员,请先修改对应管理员角色');
+        }
+        return showSuccess($role->delete());
     }
 }

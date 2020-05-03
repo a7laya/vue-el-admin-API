@@ -28,6 +28,12 @@ Route::group('admin', function(){
 
     
     // ========== 角色 相关 ==========
+    // 删除角色 
+    Route::post('role/:id/delete', 'admin.Role/delete');
+    // 修改角色状态
+    Route::post('role/:id/update_status', 'admin.Role/updateStatus');
+    // 更新角色
+    Route::post('role/:id', 'admin.Role/update');
     // 创建角色 该路由规则要写在POST最下方
     Route::post('role', 'admin.Role/save');
     // 角色列表

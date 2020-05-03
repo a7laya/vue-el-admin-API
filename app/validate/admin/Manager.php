@@ -16,7 +16,7 @@ class Manager extends BaseValidate
 	protected $rule = [
         'page' => 'require|integer|>:0', 
         'limit' => 'integer|>:0', 
-        'id|管理员id' => 'require|integer|>:0|isExist:Manager', // isExist是自定义规则
+        'id|管理员id' => 'require|integer|>:0|isExist:Manager', // isExist是在BaseValidate中的自定义规则
         'username|管理员用户名'   => 'require|min:5|max:20',
         'password'   => 'require|min:5|max:20',
         'avatar'     => 'url',
@@ -46,12 +46,12 @@ class Manager extends BaseValidate
         'updateStatus'=>['id','status']
     ];
 
-    // 创建管理员的验证场景
+    // 创建管理员的验证场景(保证名称唯一)
     public function sceneSave(){
         return $this->only(['username', 'password', 'avatar', 'role_id', 'status'])->append('username','unique:Manager');
     }
 
-    // 更新管理员的验证场景
+    // 更新管理员的验证场景(保证名称唯一)
     public function sceneUpdate(){
         $id = request()->param('id');
         return $this->only(['id', 'username', 'password', 'avatar', 'role_id', 'status'])->append('username','unique:Manager,username,'.$id);

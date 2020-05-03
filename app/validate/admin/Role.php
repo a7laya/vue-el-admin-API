@@ -14,9 +14,10 @@ class Role extends BaseValidate
      * @var array
      */	
     protected $rule = [
+        'id|角色id' => 'require|integer|>:0|isExist:Role', // isExist是在BaseValidate中的自定义规则
         'page' => 'require|integer|>:0',
         'status' => 'require|integer|in:0,1',
-        'name' => 'require',
+        'name|角色名称' => 'require',
     ];
     
     /**
@@ -35,6 +36,20 @@ class Role extends BaseValidate
      */	
     protected $scene = [
         'index' => ['page'],
-        'save' => ['name', 'status']
+        // 'save' => ['name', 'status'],
+        // 'update' => ['id', 'name', 'status']
+        'updateStatus' => ['id','status'],
+        'delete' => ['id']
     ];
+
+    // 创建角色的验证场景(保证名称唯一)
+    public function sceneSave(){
+        return $this->only(['name', 'status'])->append('name','unique:Role');
+    }
+
+    // 更新管理员的验证场景(保证名称唯一)
+    public function sceneUpdate(){
+        $id = request()->param('id');
+        return $this->only(['id','name', 'status'])->append('name','unique:Role,name,'.$id);
+    }
 }

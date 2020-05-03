@@ -28,7 +28,7 @@ class Manager extends BaseController
     // ];
     
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['save','update','delete','index', 'login', 'updateStatus'];
+    protected $excludeValidateCheck = ['index', 'save','update', 'updateStatus', 'delete', 'login'];
 
 
     /**
@@ -98,15 +98,13 @@ class Manager extends BaseController
      * @param  \think\Request  $request
      * @param  int  $id
      * @return \think\Response
+     * @desc 1.定义路由 2.定义validate(在controller配置$excludeValidateCheck) 3.$this->M->save($param)
      */
     public function update(Request $request, $id)
     {
         // 过滤参数
-        $param = $request->only(['id','username','password','avatar','role_id','status']);
-        // 找到要修改的记录集 在validate的验证$id的时候 挂载在request()->Model
-        // $Model = $this->M->find($param['id']);
-        
-        // 进行修改
+        $param = $request->only(['id','username','password','avatar','role_id','status']);        
+        // 找到要修改的记录集 在validate的验证$id的时候 通过BaseValidate中的isExist方法挂载在request()->Model
         $res = $request->Model->save($param);
         return showSuccess($res);
     }
@@ -134,7 +132,7 @@ class Manager extends BaseController
     public function delete($id)
     {   
         /**
-         * Manager验证器里面设置了验证delete的传参id
+         * 验证器里面设置了该场景的id验证
          * 同时将该id所在的记录存入request->Model
          */ 
         $manager = $this->request->Model;
