@@ -28,6 +28,8 @@ Route::group('admin', function(){
 
     
     // ========== 角色 相关 ==========
+    // 设置角色权限
+    Route::post('role/set_rules', 'admin.Role/setRules');
     // 删除角色 
     Route::post('role/:id/delete', 'admin.Role/delete');
     // 修改角色状态
@@ -38,5 +40,7 @@ Route::group('admin', function(){
     Route::post('role', 'admin.Role/save');
     // 角色列表
     Route::get('role/:page', 'admin.Role/index');
+
+
     
 })->middleware(\app\middleware\checkManagerToken::class);

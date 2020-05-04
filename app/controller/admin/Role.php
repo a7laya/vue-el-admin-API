@@ -26,7 +26,7 @@ class Role extends Basecontroller
     // ];
 
     // 需要自动验证的方法
-    protected $excludeValidateCheck = ['index', 'save','update', 'updateStatus', 'delete'];
+    protected $excludeValidateCheck = ['index', 'save','update', 'updateStatus', 'delete', 'setRules'];
 
     /**
      * 显示资源列表
@@ -142,5 +142,58 @@ class Role extends Basecontroller
             ApiException('该角色已绑定管理员,请先修改对应管理员角色');
         }
         return showSuccess($role->delete());
+    }
+
+
+    /**
+     * 给角色授权
+     *
+     * @param  int  $id
+     * @return \think\Response
+     */
+    public function setRules(){
+        /**
+         * 验证器里面设置了该场景的id验证
+         * 同时将该id所在的记录存入request->Model
+         */ 
+        $role = $this->request->Model;
+
+        // 前端传过来的1维数组 [1,2,3]
+        $ruleIds = $this->request->param('rule_ids');
+        // 后端数据表中的数据 - 获取role_rule表中role_id=传入的id的所有rule_id组成的一维数组
+        $ids = \app\model\RoleRule::where('role_id', $role->id)->column('rule_id');
+        halt($ids);
+        /**
+         * 前端: [1,2,3]  后端: [1,2,3] 
+         * 前端: [1,2,3]  后端: [1,2,3,4] -> 删除4
+         * 前端: [1,2,3]  后端: [1,2]     -> 增加3
+         * 前端: [1,2,3]  后端: [1,3,6]   -> 增加2 删除6
+         */
+
+        // 增加权限
+        $addIds = array_diff($ruleIds, $ids);
+        // 删除权限
+        $delIds = array_diff($ids, $ruleIds);
+
+        if(count($addIds)){
+            $addData = [];
+            foreach ($addIds as $key => $value) {
+                $addData[] = [
+                    'role_id' => $role->id,
+                    'rule_id' => $value
+                ];
+            }
+            $RoleRule = new \app\model\RoleRule();
+            $RoleRule->saveAll($addData);
+        }
+
+        if(count($delIds)){
+            \app\model\RoleRule::where([
+                ['role_id', '=', $role->id],
+                ['rule_id', 'in', $delIds]
+            ])->delete(); 
+        }
+
+        return showSuccess(true);
     }
 }

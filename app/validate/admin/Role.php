@@ -39,7 +39,8 @@ class Role extends BaseValidate
         // 'save' => ['name', 'status'],
         // 'update' => ['id', 'name', 'status']
         'updateStatus' => ['id','status'],
-        'delete' => ['id']
+        'delete' => ['id'],
+        'setRules' => ['id']
     ];
 
     // 创建角色的验证场景(保证名称唯一)

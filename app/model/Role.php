@@ -20,4 +20,9 @@ class Role extends Model{
         // belongsToMany(模型,中间表)
         return $this->belongsToMany('Rule','role_rule');
     }
+
+    // 
+    public function setRules($ruleIds){
+
+    }
 }
